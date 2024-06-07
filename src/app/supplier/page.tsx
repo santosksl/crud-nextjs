@@ -13,7 +13,10 @@ import {
     FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { api } from "@/lib/api";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { HiArrowLeft } from "react-icons/hi2";
 
 const supplierSchema = z.object({
@@ -26,6 +29,9 @@ const supplierSchema = z.object({
 type supplierInfer = z.infer<typeof supplierSchema>;
 
 export default function Supplier() {
+    const { toast } = useToast();
+    const router = useRouter();
+
     const stateForm = useForm<supplierInfer>({
         resolver: zodResolver(supplierSchema),
         defaultValues: {
@@ -35,7 +41,30 @@ export default function Supplier() {
     })
 
     async function onSubmit(values: supplierInfer) {
-        console.log(values)
+        await api.post('/supplier', values).then(async (res) => {
+            router.push('/product');
+            toast({
+                className: 'bg-primary text-white',
+                description: res.data.message
+            })
+        }).catch((error) => {
+            if (error.response) {
+                toast({
+                    variant: 'destructive',
+                    description: error.response.data.message || 'Category already exists!'
+                })
+            } else if (error.request) {
+                toast({
+                    variant: 'destructive',
+                    description: error.request.data.message
+                })
+            } else {
+                toast({
+                    variant: 'destructive',
+                    description: error.message
+                })
+            }
+        })
     }
 
     return (

@@ -53,17 +53,17 @@ export default function Category() {
                     variant: 'destructive',
                     description: error.response.data.message || 'Category already exists!'
                 })
-              } else if (error.request) {
+            } else if (error.request) {
                 toast({
                     variant: 'destructive',
                     description: error.request.data.message
                 })
-              } else {
+            } else {
                 toast({
                     variant: 'destructive',
                     description: error.message
                 })
-              }
+            }
         })
     }
 

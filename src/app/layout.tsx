@@ -23,9 +23,10 @@ export default function RootLayout({
           <Navbar />
         </header>
         
+        <Toaster />
+        
         {children}
 
-        <Toaster />
       </body>
     </html>
   );
