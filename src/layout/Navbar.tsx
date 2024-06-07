@@ -11,7 +11,7 @@ export default function Navbar() {
             </div>
 
             <div className="flex flex-col items-center justify-center">
-                <Link href="/user">
+                <Link href="/dashboard">
                     <FaUserCog size={30} className="text-muted-foreground" />
                 </Link>
             </div>

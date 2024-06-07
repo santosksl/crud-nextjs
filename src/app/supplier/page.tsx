@@ -54,15 +54,9 @@ export default function Supplier() {
                     description: error.response.data.message || 'E-mail already exists!'
                 })
             } else if (error.request) {
-                toast({
-                    variant: 'destructive',
-                    description: error.request.data.message
-                })
+                console.log('Error Request', error.request)
             } else {
-                toast({
-                    variant: 'destructive',
-                    description: error.message
-                })
+                console.error('Error Api', error);
             }
         })
     }

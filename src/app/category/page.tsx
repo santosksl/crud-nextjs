@@ -54,15 +54,9 @@ export default function Category() {
                     description: error.response.data.message || 'Category already exists!'
                 })
             } else if (error.request) {
-                toast({
-                    variant: 'destructive',
-                    description: error.request.data.message
-                })
+                console.error('Error Request', error.request);
             } else {
-                toast({
-                    variant: 'destructive',
-                    description: error.message
-                })
+                console.error('Error Api', error);
             }
         })
     }

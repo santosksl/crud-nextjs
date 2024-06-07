@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 const productSchema = z.object({
     name: z
@@ -61,7 +61,7 @@ export default function Supplier() {
 
     async function onSubmit(values: productInfer) {
         await api.post('/product', values).then(async (res) => {
-            router.push('/')
+            router.push('/dashboard')
             toast({
                 className: 'bg-primary text-white',
                 description: res.data.message
@@ -73,18 +73,10 @@ export default function Supplier() {
                     variant: 'destructive',
                     description: error.response.data.message
                 })
-                console.log('Error Response', error.response)
             } else if (error.request) {
-                toast({
-                    variant: 'destructive',
-                    description: error.request.data.message
-                })
                 console.log('Error Request', error.request)
             } else {
-                toast({
-                    variant: 'destructive',
-                    description: error.message
-                })
+                console.error('Error Api', error);
             }
         })
     }
