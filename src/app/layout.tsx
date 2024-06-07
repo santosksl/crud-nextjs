@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/layout/Navbar";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -23,6 +24,8 @@ export default function RootLayout({
         </header>
         
         {children}
+
+        <Toaster />
       </body>
     </html>
   );

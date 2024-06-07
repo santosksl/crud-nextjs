@@ -13,7 +13,10 @@ import {
     FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { api } from "@/lib/api";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { HiArrowLeft } from "react-icons/hi2";
 
 const categorySchema = z.object({
@@ -26,6 +29,9 @@ const categorySchema = z.object({
 type categoryInfer = z.infer<typeof categorySchema>;
 
 export default function Category() {
+    const { toast } = useToast();
+    const router = useRouter();
+
     const stateForm = useForm<categoryInfer>({
         resolver: zodResolver(categorySchema),
         defaultValues: {
@@ -35,7 +41,30 @@ export default function Category() {
     })
 
     async function onSubmit(values: categoryInfer) {
-        console.log(values)
+        await api.post('/category', values).then(async (res) => {
+            router.push('/supplier')
+            toast({
+                className: 'bg-primary text-white',
+                description: res.data.message
+            })
+        }).catch((error) => {
+            if (error.response) {
+                toast({
+                    variant: 'destructive',
+                    description: error.response.data.message || 'Category already exists!'
+                })
+              } else if (error.request) {
+                toast({
+                    variant: 'destructive',
+                    description: error.request.data.message
+                })
+              } else {
+                toast({
+                    variant: 'destructive',
+                    description: error.message
+                })
+              }
+        })
     }
 
     return (
