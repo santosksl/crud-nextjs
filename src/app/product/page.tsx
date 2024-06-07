@@ -13,6 +13,9 @@ import {
     FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 
 const productSchema = z.object({
     name: z
@@ -21,29 +24,69 @@ const productSchema = z.object({
     description: z
         .string()
         .min(2, { message: 'Description must be at least 2 characters long' }),
-    amount: z.number(),
+    amount: z
+        .string()
+        .transform((val) => parseInt(val, 10))
+        .refine((val) => !isNaN(val), { message: 'Amount must be a number' }),
     price: z
-        .number()
-        .min(1, { message: 'A product must carry a higher price' })
-        .positive({ message: 'Invalid price format' })
-        .nonnegative({ message: 'Invalid price format' }),
-    supplierId: z.number(),
-    categoryId: z.number(),
+        .string()
+        .refine((val) => /^\d+(\.\d{2})?$/.test(val), { 
+            message: 'Price must be in the format 00.00' 
+        })
+        .transform((val) => parseFloat(val))
+        .refine((val) => !isNaN(val), { message: 'Price must be a number' }),
+    supplierId: z
+        .string()
+        .transform((val) => parseInt(val, 10))
+        .refine((val) => !isNaN(val), { message: 'Supplier ID must be a number' }),
+    categoryId: z
+        .string()
+        .transform((val) => parseInt(val, 10))
+        .refine((val) => !isNaN(val), { message: 'Category ID must be a number' })
 })
 
 type productInfer = z.infer<typeof productSchema>;
 
 export default function Supplier() {
+    const { toast } = useToast();
+    const router = useRouter();
+
     const stateForm = useForm<productInfer>({
         resolver: zodResolver(productSchema),
         defaultValues: {
             name: '',
-            description: ''
+            description: '',
         },
     })
 
     async function onSubmit(values: productInfer) {
-        console.log(values)
+        await api.post('/product', values).then(async (res) => {
+            router.push('/')
+            toast({
+                className: 'bg-primary text-white',
+                description: res.data.message
+            })
+            console.log('Response', res)
+        }).catch((error) => {
+            if (error.response) {
+                toast({
+                    variant: 'destructive',
+                    description: error.response.data.message
+                })
+                console.log('Error Response', error.response)
+            } else if (error.request) {
+                toast({
+                    variant: 'destructive',
+                    description: error.request.data.message
+                })
+                console.log('Error Request', error.request)
+            } else {
+                toast({
+                    variant: 'destructive',
+                    description: error.message
+                })
+            }
+        })
     }
 
     return (
@@ -112,7 +155,7 @@ export default function Supplier() {
                                             <FormItem>
                                             <FormLabel>Price</FormLabel>
                                             <FormControl>
-                                                <Input {...field} type="number" placeholder="R$ 5685,00"/>
+                                                <Input {...field} placeholder="R$ 5685,00"/>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
